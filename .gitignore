@@ -1,0 +1,18 @@
+# Java / Spring Boot
+/backend/target/
+backend/.classpath
+backend/.project
+backend/.settings/
+backend/.idea/
+backend/*.iml
+backend/.vscode/
+
+# Node.js / React
+/frontend/node_modules/
+frontend/build/
+frontend/.vscode/
+frontend/.env
+
+# OS Files
+.DS_Store
+Thumbs.db
