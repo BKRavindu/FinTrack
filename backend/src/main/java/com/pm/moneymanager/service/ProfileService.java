@@ -6,6 +6,7 @@ import com.pm.moneymanager.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -13,12 +14,20 @@ import java.util.UUID;
 public class ProfileService {
 
     private final ProfileRepository profileRepository;
+    private final EmailService emailService;
 
     public ProfileDTO registerProfile(ProfileDTO profileDTO) {
 
         Profile newProfile = toEntity(profileDTO);
         newProfile.setActivationToken(UUID.randomUUID().toString());
         Profile savedProfile = profileRepository.save(newProfile);
+        //send activation link
+        String activationLink = "http://localhost:8080/api/v1.0/activate?token=" + savedProfile.getActivationToken();
+        String subject = "Activate your money manager account ";
+        String body = "Click here to activate your money manager account: " + activationLink;
+        emailService.sendEmail(newProfile.getEmail(), subject, body);
+
+
         return toDTO(savedProfile);
     }
 
@@ -44,5 +53,15 @@ public class ProfileService {
                 .updatedAt(profile.getUpdatedAt())
                 .build();
 
+    }
+
+    public boolean activateProfile(String activationToken) {
+        return profileRepository.findByActivationToken(activationToken)
+        .map(profile -> {
+            profile.setActivationToken(null);//clear activation token
+            profileRepository.save(profile);
+            return true;
+        })
+                .orElse(false);
     }
 }

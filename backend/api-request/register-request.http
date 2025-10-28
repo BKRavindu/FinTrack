@@ -2,7 +2,7 @@ POST http://localhost:8080/api/v1.0/register
 Content-Type: application/json
 
 {
-  "fullName": "M.Smith john",
-  "email": "john@gmail.com",
+  "fullName": "M. Sej john",
+  "email": "hacawa5424@haotuwu.com",
   "password": "1234532"
 }
