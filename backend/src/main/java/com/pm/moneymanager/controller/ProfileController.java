@@ -20,14 +20,13 @@ public class ProfileController {
         return ResponseEntity.status(HttpStatus.CREATED).body(registeredProfile);
     }
 
-    @GetMapping("/activation")
-    public ResponseEntity<String> activateProfile(@RequestParam String activationToken) {
-        boolean isActivated = profileService.activateProfile(activationToken);
+    @GetMapping("/activate")
+    public ResponseEntity<String> activateProfile(@RequestParam String token) {
+        boolean isActivated = profileService.activateProfile(token);
         if (isActivated) {
             return ResponseEntity.status(HttpStatus.OK).body("Activated the profile");
         }else{
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Activation token not found or already used");
-
         }
     }
 }
