@@ -58,7 +58,7 @@ public class ProfileService {
     public boolean activateProfile(String activationToken) {
         return profileRepository.findByActivationToken(activationToken)
         .map(profile -> {
-            profile.setActivationToken(null);//clear activation token
+            profile.setIsActive(true);//clear activation token
             profileRepository.save(profile);
             return true;
         })
