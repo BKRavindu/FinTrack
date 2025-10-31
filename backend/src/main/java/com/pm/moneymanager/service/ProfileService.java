@@ -4,6 +4,7 @@ import com.pm.moneymanager.dto.ProfileDTO;
 import com.pm.moneymanager.model.Profile;
 import com.pm.moneymanager.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -15,6 +16,7 @@ public class ProfileService {
 
     private final ProfileRepository profileRepository;
     private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
 
     public ProfileDTO registerProfile(ProfileDTO profileDTO) {
 
@@ -36,7 +38,7 @@ public class ProfileService {
                 .id(profileDTO.getId())
                 .fullName(profileDTO.getFullName())
                 .email(profileDTO.getEmail())
-                .password(profileDTO.getPassword())
+                .password(passwordEncoder.encode(profileDTO.getPassword()))
                 .profileImageUrl(profileDTO.getProfileImageUrl())
                 .createdAt(profileDTO.getCreatedAt())
                 .updatedAt(profileDTO.getUpdatedAt())
