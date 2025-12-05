@@ -4,6 +4,8 @@ import com.pm.moneymanager.dto.ProfileDTO;
 import com.pm.moneymanager.model.Profile;
 import com.pm.moneymanager.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -65,5 +67,37 @@ public class ProfileService {
             return true;
         })
                 .orElse(false);
+    }
+
+    public boolean isAccountActive(String email) {
+        return profileRepository.findByEmail(email)
+                .map(Profile::getIsActive)
+                .orElse(false);
+    }
+
+    public Profile getCurrentProfile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return profileRepository.findByEmail(authentication.getName())
+                .orElseThrow(()-> new RuntimeException("No active profile found"+ authentication.getName()));
+
+    }
+
+    public ProfileDTO getPublicProfile(String email) {
+        Profile currentUser = null;
+        if(email == null) {
+            currentUser = getCurrentProfile();
+        }else {
+            currentUser = profileRepository.findByEmail(email)
+                    .orElseThrow(()-> new RuntimeException("No active profile found"+ email));
+        }
+
+        return ProfileDTO.builder()
+                .id(currentUser.getId())
+                .fullName(currentUser.getFullName())
+                .email(currentUser.getEmail())
+                .profileImageUrl(currentUser.getProfileImageUrl())
+                .createdAt(currentUser.getCreatedAt())
+                .updatedAt(currentUser.getUpdatedAt())
+                .build();
     }
 }
