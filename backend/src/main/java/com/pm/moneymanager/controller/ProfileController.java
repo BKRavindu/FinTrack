@@ -1,5 +1,6 @@
 package com.pm.moneymanager.controller;
 
+import com.pm.moneymanager.dto.AuthDTO;
 import com.pm.moneymanager.dto.ProfileDTO;
 import com.pm.moneymanager.service.ProfileService;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +8,9 @@ import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,6 +31,23 @@ public class ProfileController {
             return ResponseEntity.status(HttpStatus.OK).body("Activated the profile");
         }else{
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Activation token not found or already used");
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Map<String,Object>> login(@RequestBody AuthDTO authDTO) {
+        try{
+            if(!profileService.isAccountActive(authDTO.getEmail())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
+                        "message", "Account is not activated please activate the account"
+                ));
+            }
+            Map<String, Object> response = profileService.authenticateAndGenerateToken(authDTO);
+            return ResponseEntity.ok(response);
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                    "message", e.getMessage()
+            ));
         }
     }
 }
