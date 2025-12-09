@@ -1,6 +1,6 @@
 package com.pm.moneymanager.service;
 
-import com.pm.moneymanager.dto.AuthDTO;
+import com.pm.moneymanager.dto.LoginRequestDTO;
 import com.pm.moneymanager.dto.ProfileDTO;
 import com.pm.moneymanager.model.Profile;
 import com.pm.moneymanager.repository.ProfileRepository;
@@ -14,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -108,19 +107,25 @@ public class ProfileService {
                 .build();
     }
 
-    public Map<String, Object> authenticateAndGenerateToken(AuthDTO authDTO) {
+    public Map<String, Object> authenticateAndGenerateToken(LoginRequestDTO authDTO) {
+        System.out.println("Trying login for email: " + authDTO.getEmail());
 
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authDTO.getEmail(), authDTO.getPassword()));
-            //Generate JWT token
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(authDTO.getEmail(), authDTO.getPassword())
+            );
+            System.out.println("Authentication successful for: " + authDTO.getEmail());
+
             String token = jwtUtil.generateToken(authDTO.getEmail());
-            return Map.of("token", token,
+            return Map.of(
+                    "token", token,
                     "user", getPublicProfile(authDTO.getEmail())
             );
 
-        }catch (Exception e) {
+        } catch (Exception e) {
+            System.out.println("Authentication failed: " + e.getMessage());
             throw new RuntimeException("Invalid email or password");
-
         }
     }
+
 }
