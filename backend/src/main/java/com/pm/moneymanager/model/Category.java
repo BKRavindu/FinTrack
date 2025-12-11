@@ -25,6 +25,7 @@ public class Category {
 
     @Column(updatable = false)
     @CreationTimestamp
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
@@ -36,4 +37,14 @@ public class Category {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }
