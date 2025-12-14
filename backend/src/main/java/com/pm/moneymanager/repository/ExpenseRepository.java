@@ -1,0 +1,37 @@
+package com.pm.moneymanager.repository;
+
+import com.pm.moneymanager.model.Expense;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+public interface ExpenseRepository extends JpaRepository<Expense, Integer> {
+
+    List<Expense> findByProfileIdOrderByDateDesc(Long profileId);
+
+    List<Expense> findTop5ByProfileIdOrderByDateDesc(Long profileId);
+
+    @Query("SELECT SUM(e.amount) FROM Expense e WHERE e.profile.id = :profileId")
+    BigDecimal findTotalExpenseByProfileId(@Param("profileId") Long profileId);
+
+    List<Expense> findBYProfileIdAndDateBetweenAndNameContainingIgnoreCase(
+            Long profileId,
+            LocalDate startDate,
+            LocalDate endDate,
+            String keyword,
+            Sort sort
+    );
+
+    List<Expense> findByProfileIdAndDateBetween(
+            Long ProfileId,
+            LocalDate startDate,
+            LocalDate endDate
+    );
+
+}
