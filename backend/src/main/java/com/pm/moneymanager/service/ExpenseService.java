@@ -4,6 +4,7 @@ import com.pm.moneymanager.dto.ExpenseDTO;
 import com.pm.moneymanager.model.Category;
 import com.pm.moneymanager.model.Expense;
 import com.pm.moneymanager.model.Profile;
+import com.pm.moneymanager.repository.CategoryRepository;
 import com.pm.moneymanager.repository.ExpenseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,17 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ExpenseService {
     private final ExpenseRepository expenseRepository;
-    private final CategoryService categoryService;
+    private final CategoryRepository categoryRepository;
+    private final ProfileService profileService;
+
+    public ExpenseDTO addExpense(ExpenseDTO expenseDTO) {
+        Profile profile = profileService.getCurrentProfile();
+        Category category = categoryRepository.findById(expenseDTO.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        Expense newExpense = toEntity(expenseDTO, category, profile);
+        expenseRepository.save(newExpense);
+        return toDTO(newExpense);
+    }
 
     private Expense toEntity(ExpenseDTO expenseDTO, Category category, Profile profile) {
         return Expense.builder()

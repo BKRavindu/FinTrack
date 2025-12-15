@@ -1,12 +1,9 @@
 package com.pm.moneymanager.service;
 
 import com.pm.moneymanager.dto.IncomeDTO;
-import com.pm.moneymanager.dto.IncomeDTO;
-import com.pm.moneymanager.model.Category;
+import com.pm.moneymanager.model.*;
 import com.pm.moneymanager.model.Income;
-import com.pm.moneymanager.model.Income;
-import com.pm.moneymanager.model.Profile;
-import com.pm.moneymanager.repository.IncomeRepository;
+import com.pm.moneymanager.repository.CategoryRepository;
 import com.pm.moneymanager.repository.IncomeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +13,17 @@ import org.springframework.stereotype.Service;
 public class IncomeService {
 
     private final IncomeRepository incomeRepository;
-    private final CategoryService categoryService;
+    private final CategoryRepository categoryRepository;
+    private final ProfileService profileService;
+
+    public IncomeDTO addIncome(IncomeDTO incomeDTO) {
+        Profile profile = profileService.getCurrentProfile();
+        Category category = categoryRepository.findById(incomeDTO.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        Income newIncome = toEntity(incomeDTO, category, profile);
+        incomeRepository.save(newIncome);
+        return toDTO(newIncome);
+    }
 
     private Income toEntity(IncomeDTO incomeDTO, Category category, Profile profile) {
         return Income.builder()
