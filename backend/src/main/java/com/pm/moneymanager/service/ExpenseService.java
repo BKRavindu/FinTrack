@@ -9,6 +9,9 @@ import com.pm.moneymanager.repository.ExpenseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ExpenseService {
@@ -23,6 +26,15 @@ public class ExpenseService {
         Expense newExpense = toEntity(expenseDTO, category, profile);
         expenseRepository.save(newExpense);
         return toDTO(newExpense);
+    }
+
+    public List<ExpenseDTO> getCurrentMonthExpensesForCurrentUser() {
+        Profile profile = profileService.getCurrentProfile();
+        LocalDate today = LocalDate.now();
+        LocalDate startDate = today.withDayOfMonth(1);
+        LocalDate endDate = today.withDayOfMonth(today.lengthOfMonth());
+        List<Expense> list = expenseRepository.findByProfileIdAndDateBetween(profile.getId(), startDate, endDate);
+        return list.stream().map(this::toDTO).toList();
     }
 
     private Expense toEntity(ExpenseDTO expenseDTO, Category category, Profile profile) {

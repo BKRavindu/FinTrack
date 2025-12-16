@@ -1,5 +1,6 @@
 package com.pm.moneymanager.service;
 
+import com.pm.moneymanager.dto.ExpenseDTO;
 import com.pm.moneymanager.dto.IncomeDTO;
 import com.pm.moneymanager.model.*;
 import com.pm.moneymanager.model.Income;
@@ -7,6 +8,9 @@ import com.pm.moneymanager.repository.CategoryRepository;
 import com.pm.moneymanager.repository.IncomeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +27,15 @@ public class IncomeService {
         Income newIncome = toEntity(incomeDTO, category, profile);
         incomeRepository.save(newIncome);
         return toDTO(newIncome);
+    }
+
+    public List<IncomeDTO> getCurrentMonthIncomesForCurrentUser() {
+        Profile profile = profileService.getCurrentProfile();
+        LocalDate today = LocalDate.now();
+        LocalDate startDate = today.withDayOfMonth(1);
+        LocalDate endDate = today.withDayOfMonth(today.lengthOfMonth());
+        List<Income> list = incomeRepository.findByProfileIdAndDateBetween(profile.getId(), startDate, endDate);
+        return list.stream().map(this::toDTO).toList();
     }
 
     private Income toEntity(IncomeDTO incomeDTO, Category category, Profile profile) {

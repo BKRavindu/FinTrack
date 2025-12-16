@@ -1,0 +1,10 @@
+POST http://localhost:8080/api/v1.0/expenses
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJoZWtpbGk1MjgwQGt1ZGltaS5jb20iLCJpYXQiOjE3NjU4ODYyODcsImV4cCI6MTc2NTk3MjY4N30.1y67BXc8xCWr9eyumLVMlz3PhNKqj-rKgBOaffy0K2U
+
+
+{
+  "name": "Tablets for fever",
+  "categoryId": 3,
+  "amount": 500
+}

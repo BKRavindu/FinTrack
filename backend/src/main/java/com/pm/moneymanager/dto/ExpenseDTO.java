@@ -14,12 +14,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class ExpenseDTO {
-    private int id;
+    private Long id;
     private String name;
     private String icon;
     private Long categoryId;
     private String categoryName;
-    private BigDecimal amount;
+    private double amount;
     private LocalDate date;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
