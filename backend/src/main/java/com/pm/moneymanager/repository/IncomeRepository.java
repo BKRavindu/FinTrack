@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface IncomeRepository extends JpaRepository<Income, Integer> {
+public interface IncomeRepository extends JpaRepository<Income, Long> {
     List<Income> findByProfileIdOrderByDateDesc(Long profileId);
 
     List<Income> findTop5ByProfileIdOrderByDateDesc(Long profileId);
