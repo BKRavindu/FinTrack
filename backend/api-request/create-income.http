@@ -1,0 +1,10 @@
+POST http://localhost:8080/api/v1.0/incomes
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJoZWtpbGk1MjgwQGt1ZGltaS5jb20iLCJpYXQiOjE3NjYzOTczNzAsImV4cCI6MTc2NjQ4Mzc3MH0.uVe2FZlKMIKpnAT4ktdq3TN9D3dm418ElQOdD-wK9lE
+
+
+{
+  "name": "Salary",
+  "categoryId": 3,
+  "amount": 10000
+}

@@ -28,7 +28,7 @@ public class Expense {
     private String description;
     private String icon;
     private LocalDate date;
-    private double amount;
+    private BigDecimal amount;
 
     @Column(updatable = false)
     @CreationTimestamp
