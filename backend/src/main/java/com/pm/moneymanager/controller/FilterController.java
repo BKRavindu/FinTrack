@@ -1,5 +1,6 @@
 package com.pm.moneymanager.controller;
 
+import com.pm.moneymanager.dto.ExpenseDTO;
 import com.pm.moneymanager.dto.FilterDTO;
 import com.pm.moneymanager.dto.IncomeDTO;
 import com.pm.moneymanager.service.ExpenseService;
@@ -33,7 +34,12 @@ public class FilterController {
         Sort sort = Sort.by(direction, sortFields);
         if("income".equals(filter.getType())){
             List<IncomeDTO> incomes = incomeService.filterIncomes(startDate,endDate,keyword,sort);
+            return ResponseEntity.ok(incomes);
+        }else if("expense".equalsIgnoreCase(filter.getType())){
+            List<ExpenseDTO> expenses = expenseService.filterExpenses(startDate,endDate,keyword,sort);
+            return ResponseEntity.ok(expenses);
+        }else {
+            return ResponseEntity.badRequest().body("Invalid filter type, Must be income or expense");
         }
     }
-
 }
