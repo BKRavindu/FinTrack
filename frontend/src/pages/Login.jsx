@@ -1,7 +1,11 @@
-import { useState } from "react";
+import {useContext, useState} from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import moment from "moment";
+import axiosConfig from "../util/axiosConfig.jsx";
+import { API_ENDPOINTS } from "../util/apiEndpoints.js";
+import toast from "react-hot-toast";
+import {AppContext} from "../context/AppContext.jsx";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -10,10 +14,11 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
+    const {setUser} = useContext(AppContext);
 
     const loginTime = moment().format("MMMM Do YYYY, h:mm A");
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!email || !password) {
@@ -22,9 +27,29 @@ const Login = () => {
         }
 
         setError("");
-        console.log({ email, password, loginTime });
 
-        // navigate("/dashboard");
+        try {
+
+            const response = await axiosConfig.post(API_ENDPOINTS.LOGIN_URL, {
+                email,
+                password,
+            });
+
+            if (response.status === 200) {
+                const {token, user} = response.data;
+                if (token) {
+                    localStorage.setItem("token", token);
+                    setUser(user);
+                    toast.success("Login successful!");
+                    navigate("/dashboard");
+                }
+            }
+        } catch (err) {
+            console.error("Login failed", err);
+
+            const message = err.response?.data?.message || "Something went wrong";
+            toast.error(message);
+        }
     };
 
     return (

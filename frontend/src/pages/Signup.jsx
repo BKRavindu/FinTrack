@@ -2,6 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import moment from "moment";
+import axiosConfig from "../util/axiosConfig.jsx";
+import toast from "react-hot-toast";
+import {API_ENDPOINTS, BASE_URL} from "../util/apiEndpoints.js";
 
 const Signup = () => {
     const navigate = useNavigate();
@@ -20,7 +23,7 @@ const Signup = () => {
     const isValidEmail = (email) =>
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         setEmailError("");
@@ -42,8 +45,21 @@ const Signup = () => {
             return;
         }
 
-        console.log({ fullName, email, password, createdAt });
-        // navigate("/login");
+        try {
+            const response = await axiosConfig.post(API_ENDPOINTS.REGISTER_URL,{
+                fullName,
+                email,
+                password,
+            })
+            if (response.status === 201) {
+                toast.success("Profile created!");
+                navigate("/login");
+            }
+        }catch (error) {
+            console.error("Something went wrong", error);
+            toast.error(error.message);
+        }
+
     };
 
     return (
