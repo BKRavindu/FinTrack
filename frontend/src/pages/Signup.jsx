@@ -2,9 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import moment from "moment";
-import axiosConfig from "../util/axiosConfig.jsx";
 import toast from "react-hot-toast";
-import {API_ENDPOINTS, BASE_URL} from "../util/apiEndpoints.js";
+
+import axiosConfig from "../util/axiosConfig.jsx";
+import { API_ENDPOINTS } from "../util/apiEndpoints.js";
+import uploadProfileImage from "../util/uploadProfileImage.js";
 
 const Signup = () => {
     const navigate = useNavigate();
@@ -14,9 +16,13 @@ const Signup = () => {
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
 
+    const [profileImage, setProfileImage] = useState(null);
+    const [preview, setPreview] = useState(null);
+
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
     const [formError, setFormError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const createdAt = moment().format("MMMM Do YYYY");
 
@@ -46,20 +52,35 @@ const Signup = () => {
         }
 
         try {
-            const response = await axiosConfig.post(API_ENDPOINTS.REGISTER_URL,{
-                fullName,
-                email,
-                password,
-            })
+            setLoading(true);
+
+            let profileImageUrl = "";
+
+            // Upload profile image if selected
+            if (profileImage) {
+                profileImageUrl = await uploadProfileImage(profileImage);
+            }
+
+            const response = await axiosConfig.post(
+                API_ENDPOINTS.REGISTER_URL,
+                {
+                    fullName,
+                    email,
+                    password,
+                    profileImageUrl
+                }
+            );
+
             if (response.status === 201) {
-                toast.success("Profile created!");
+                toast.success("Profile created successfully!");
                 navigate("/login");
             }
-        }catch (error) {
-            console.error("Something went wrong", error);
-            toast.error(error.message);
+        } catch (error) {
+            console.error(error);
+            toast.error("Signup failed. Try again.");
+        } finally {
+            setLoading(false);
         }
-
     };
 
     return (
@@ -68,9 +89,11 @@ const Signup = () => {
 
                 {/* Header */}
                 <div className="text-center mb-6">
-                    <h1 className="text-3xl font-bold text-gray-800">Create Account</h1>
+                    <h1 className="text-3xl font-bold text-gray-800">
+                        Create Account
+                    </h1>
                     <p className="text-gray-500 text-sm mt-1">
-                        Tracking your money join us today ✨
+                        Track your money — join us today ✨
                     </p>
                 </div>
 
@@ -83,9 +106,44 @@ const Signup = () => {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
 
+                    {/* Profile Image Upload */}
+                    <div className="flex flex-col items-center gap-2">
+                        <label className="relative cursor-pointer">
+                            <div className="w-24 h-24 rounded-full border-2 border-dashed border-indigo-400 flex items-center justify-center overflow-hidden">
+                                {preview ? (
+                                    <img
+                                        src={preview}
+                                        alt="Profile Preview"
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <User size={32} className="text-indigo-400" />
+                                )}
+                            </div>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                hidden
+                                onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if (file) {
+                                        setProfileImage(file);
+                                        setPreview(URL.createObjectURL(file));
+                                    }
+                                }}
+                            />
+                        </label>
+                        <p className="text-xs text-gray-500">
+                            Upload profile photo (optional)
+                        </p>
+                    </div>
+
                     {/* Full Name */}
                     <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                        <User
+                            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                            size={18}
+                        />
                         <input
                             type="text"
                             placeholder="Full Name"
@@ -98,7 +156,10 @@ const Signup = () => {
                     {/* Email */}
                     <div>
                         <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                            <Mail
+                                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                size={18}
+                            />
                             <input
                                 type="text"
                                 placeholder="Email address"
@@ -110,14 +171,19 @@ const Signup = () => {
                             />
                         </div>
                         {emailError && (
-                            <p className="text-xs text-red-500 mt-1">{emailError}</p>
+                            <p className="text-xs text-red-500 mt-1">
+                                {emailError}
+                            </p>
                         )}
                     </div>
 
                     {/* Password */}
                     <div>
                         <div className="relative">
-                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                            <Lock
+                                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                size={18}
+                            />
                             <input
                                 type={showPassword ? "text" : "password"}
                                 placeholder="Password"
@@ -132,11 +198,17 @@ const Signup = () => {
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
                             >
-                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                {showPassword ? (
+                                    <EyeOff size={18} />
+                                ) : (
+                                    <Eye size={18} />
+                                )}
                             </button>
                         </div>
                         {passwordError && (
-                            <p className="text-xs text-red-500 mt-1">{passwordError}</p>
+                            <p className="text-xs text-red-500 mt-1">
+                                {passwordError}
+                            </p>
                         )}
                     </div>
 
@@ -144,11 +216,13 @@ const Signup = () => {
                         Account will be created on {createdAt}
                     </p>
 
+                    {/* Submit */}
                     <button
                         type="submit"
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-medium transition"
+                        disabled={loading}
+                        className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white py-2 rounded-lg font-medium transition"
                     >
-                        Sign Up
+                        {loading ? "Creating Account..." : "Sign Up"}
                     </button>
                 </form>
 
