@@ -1,6 +1,10 @@
+import Dashboard from "../components/Dashboard.jsx";
+
 const Filter = () => {
     return (
-        <div>Income</div>
+        <Dashboard>
+            <div>This is Filter</div>
+        </Dashboard>
     )
 }
 export default Filter

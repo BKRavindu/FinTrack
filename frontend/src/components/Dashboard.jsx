@@ -1,9 +1,26 @@
-import MenuBar from "./Menubar.jsx";
+import { useState } from "react";
+import { Outlet } from "react-router-dom";
+import MenuBar from "./MenuBar.jsx";
+import Sidebar from "./Sidebar.jsx";
 
-const Dashboard = () => {
+const DashboardLayout = () => {
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
     return (
-        <MenuBar />
-    )
-}
+        <div className="flex h-screen">
+            <Sidebar isOpen={sidebarOpen} />
+            <div className="flex-1 flex flex-col">
+                <MenuBar
+                    isSidebarOpen={sidebarOpen}
+                    onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+                />
 
-export default Dashboard;
+                <main className="flex-1 p-6 bg-gray-50 overflow-auto mt-18">
+                    <Outlet />
+                </main>
+            </div>
+        </div>
+    );
+};
+
+export default DashboardLayout;

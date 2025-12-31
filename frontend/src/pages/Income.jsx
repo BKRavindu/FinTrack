@@ -1,6 +1,10 @@
+import Dashboard from "../components/Dashboard.jsx";
+
 const Income = () => {
     return (
-        <div>Income</div>
+        <Dashboard>
+            This is Category
+        </Dashboard>
     )
 }
 export default Income
